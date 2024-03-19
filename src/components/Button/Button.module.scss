@@ -1,0 +1,29 @@
+.root {
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background-color 200ms ease;
+}
+
+.root[type="submit"] {
+  padding: 15px 70.5px;
+  color: var(--white);
+  background-color: var(--purpure400);
+
+  &:hover {
+    background-color: var(--purpure500);
+  }
+}
+
+.root[type="reset"] {
+  padding: 15px 73px;
+  color: var(--white);
+  background-color: var(--gray);
+
+  &:hover {
+    background-color: var(--brown);
+  }
+}
+
+.root:disabled {
+  cursor: not-allowed;
+}

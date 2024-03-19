@@ -1,0 +1,15 @@
+.root {
+  overflow-y: auto;
+
+  width: 100%;
+  max-width: 800px;
+  height: 70vh;
+  margin: 0 auto;
+  margin-top: 40px;
+
+  color: var(--brown);
+
+  background-color: var(--purpure100);
+  border-radius: 6px;
+  box-shadow: 0 2px 2px rgb(204 197 185 / 50%);
+}

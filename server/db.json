@@ -1,0 +1,36 @@
+{
+  "user": [
+    {
+      "username": "admin",
+      "password": "admin"
+    }
+  ],
+  "tests": [
+    {
+      "id": 0,
+      "title": "Первый",
+      "questions": [
+        {
+          "id": 0,
+          "text": "Вопрос 1",
+          "type": 0,
+          "variants": ["da", "net"]
+        }
+      ],
+      "date": "2018-01-02"
+    },
+    {
+      "id": 1,
+      "title": "Вервый",
+      "questions": [
+        {
+          "id": 0,
+          "text": "Вопрос 1",
+          "type": 0,
+          "variants": ["da", "net"]
+        }
+      ],
+      "date": "2018-01-03"
+    }
+  ]
+}
