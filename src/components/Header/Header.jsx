@@ -2,11 +2,14 @@ import cx from "classnames";
 
 import s from "./Header.module.scss";
 import { Link } from "react-router-dom";
-import { userLogout } from "@src/utils/userSaga";
-import { useDispatch } from "react-redux";
+import { useGetCurrentUserQuery, useLogoutMutation } from "@src/utils/testsApi";
 
 const Header = ({ className }) => {
-  const dispatch = useDispatch();
+  const { data } = useGetCurrentUserQuery();
+  const [logout] = useLogoutMutation();
+  const handlerLogout = () => {
+    logout();
+  };
   return (
     <div className={cx(s.root, className)}>
       <nav className={s.nav}>
@@ -22,10 +25,11 @@ const Header = ({ className }) => {
             </Link>
           </li>
           <li className={s.item}>
-            <span onClick={() => dispatch(userLogout())} className={s.logout}>
+            <span onClick={handlerLogout} className={s.logout}>
               выход
             </span>
           </li>
+          <li className={s.item}>{data.username}</li>
         </ul>
       </nav>
     </div>

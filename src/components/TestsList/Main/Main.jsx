@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import cx from "classnames";
 
@@ -10,23 +10,16 @@ import Container from "@components/Container";
 import s from "./Main.module.scss";
 import editSvg from "@src/assets/edit.svg";
 import viewSvg from "@src/assets/view.svg";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchTests } from "@src/utils/testsSaga";
+import { useGetTestsQuery } from "@src/utils/testsApi";
 
 const Main = memo(({ filter }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [id, setId] = useState(null);
-  const dispatch = useDispatch();
-  const tests = useSelector((state) => state.tests);
-  const order = useSelector((state) => state.tests.order);
-
-  useEffect(() => {
-    // При монтировании компонента вызываем fetchTests, чтобы загрузить список тестов
-    dispatch(fetchTests(order));
-  }, [dispatch, order]);
+  const { data: tests, isLoading, isError, isSuccess } = useGetTestsQuery({ page: 1, per: 5, search: "", sort: "created_at_desc" });
 
   const { pathname } = useLocation();
+
   const checkItem = useCallback(
     (item) => {
       if (!filter) {
@@ -62,17 +55,16 @@ const Main = memo(({ filter }) => {
     },
     [setIsEdit, setId],
   );
-
   return (
-    !tests.loading && (
+    !isLoading && (
       <main className={s.root}>
         <Container>
           <ul className={s.list}>
-            {tests.tests
-              .filter((item) => checkItem(item))
+            {tests?.tests
+              ?.filter((item) => checkItem(item))
               .map((item, idx) => (
                 <li key={idx} className={s.item}>
-                  <Link to={`/${item.id}`} className={s.link} />
+                  <Link to={`/edit/${item.id}/`} className={s.link} />
                   <div className={s.info}>
                     <p className={s.title}>{item.title}</p>
                     <p className={s.date}>{item.date}</p>

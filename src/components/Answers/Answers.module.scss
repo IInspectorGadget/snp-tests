@@ -1,0 +1,68 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.list {
+  display: flex;
+  border-spacing: 0;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.item {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-left: 20px;
+
+  &::before {
+    content: "*";
+    position: absolute;
+    top: 3px;
+    left: 0;
+  }
+}
+
+.buttons {
+  display: flex;
+  gap: 20px;
+}
+
+.close {
+  cursor: pointer;
+
+  position: relative;
+
+  width: 20px;
+  height: 20px;
+
+  color: var(--purpure400);
+
+  &::before,
+  &::after {
+    content: "";
+
+    position: absolute;
+    top: 15%;
+    left: calc(50% - 1px);
+
+    width: 2px;
+    height: 70%;
+
+    background: currentcolor;
+    border-radius: 2px;
+  }
+
+  &::before {
+    transform: rotate(45deg);
+  }
+
+  &::after {
+    transform: rotate(-45deg);
+  }
+}

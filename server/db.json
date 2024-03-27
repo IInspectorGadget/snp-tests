@@ -1,36 +1,70 @@
 {
   "user": [
     {
+      "id": "235b",
       "username": "admin",
-      "password": "admin"
+      "password": "admin",
+      "isAdmin": true
     }
   ],
   "tests": [
     {
-      "id": 0,
-      "title": "Первый",
-      "questions": [
-        {
-          "id": 0,
-          "text": "Вопрос 1",
-          "type": 0,
-          "variants": ["da", "net"]
-        }
-      ],
-      "date": "2018-01-02"
+      "title": "0",
+      "date": "2024-03-21T11:23:53.159Z",
+      "id": "0"
     },
     {
-      "id": 1,
-      "title": "Вервый",
+      "id": "1",
+      "title": "Первый1",
+      "date": "2018-01-03",
       "questions": [
         {
-          "id": 0,
-          "text": "Вопрос 1",
-          "type": 0,
-          "variants": ["da", "net"]
+          "text": "Привет",
+          "answers": [
+            {
+              "id": "1",
+              "text": "Ну здарова",
+              "isCorrect": true
+            },
+            {
+              "id": "476f4721-a5d9-4d4e-8739-5ee683f616f7",
+              "text": "Как сам",
+              "isCorrect": false
+            },
+            {
+              "id": "cee1cf1a-0a63-4f8f-afcc-d47b1bac5337",
+              "text": "Да",
+              "isCorrect": false
+            }
+          ],
+          "type": 1,
+          "id": "1"
+        },
+        {
+          "text": "123",
+          "answers": [
+            {
+              "id": "8e513a32-d3a8-4406-b456-9fb406c83678",
+              "text": "432",
+              "isCorrect": true
+            }
+          ],
+          "type": 1,
+          "id": "537a57df-3bb0-4a10-a440-5a17c8f13db0"
+        },
+        {
+          "text": "123",
+          "answers": [
+            {
+              "id": "ca9fb2e8-fcdf-4938-b2f5-9ac48665ceca",
+              "text": "123",
+              "isCorrect": true
+            }
+          ],
+          "type": 1,
+          "id": "524ff59f-5000-4b37-a524-b93e69232d0b"
         }
-      ],
-      "date": "2018-01-03"
+      ]
     }
   ]
 }

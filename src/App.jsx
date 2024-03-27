@@ -1,24 +1,27 @@
-import { Provider, useDispatch, useSelector } from "react-redux";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import store from "./utils/store";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import PrivateRoute from "./utils/PrivateRoute";
 
 import "./App.scss";
+import { useGetCurrentUserQuery } from "./utils/testsApi";
 
 function App() {
+  const { isLoading, isSuccess } = useGetCurrentUserQuery();
+
   return (
-    <div className='root'>
-      <Router>
-        <Routes>
-          <Route element={<PrivateRoute />}>
-            <Route element={<HomePage />} path='*' exact />
-          </Route>
-          <Route element={<LoginPage />} path='/login' />
-        </Routes>
-      </Router>
-    </div>
+    !isLoading && (
+      <div className='root'>
+        <Router>
+          <Routes>
+            <Route element={<PrivateRoute isAuth={isSuccess} />}>
+              <Route element={<HomePage />} path='*' exact />
+            </Route>
+            <Route element={<LoginPage isAuth={isSuccess} />} path='/auth/*' />
+          </Routes>
+        </Router>
+      </div>
+    )
   );
 }
 

@@ -4,11 +4,26 @@ import cx from "classnames";
 import s from "./Input.module.scss";
 
 const Input = memo(
-  ({ className, type = "text", placeholder, name, id, maxLength, isRequired = true, value, setValue, setDirty, setError, checkErrors }) => {
+  ({
+    className,
+    onBlur,
+    type = "text",
+    placeholder,
+    name,
+    id,
+    maxLength,
+    isRequired = true,
+    value,
+    setValue,
+    setDirty,
+    setError,
+    checkErrors,
+  }) => {
     const handlerBlur = useCallback(() => {
+      onBlur && onBlur();
       setValue((prev) => prev.trim());
       checkErrors && checkErrors(type, value.trim(), maxLength, isRequired, setError, setDirty);
-    }, [checkErrors, isRequired, maxLength, setDirty, setError, setValue, type, value]);
+    }, [checkErrors, onBlur, isRequired, maxLength, setDirty, setError, setValue, type, value]);
 
     const handlerChange = useCallback(
       (e) => {

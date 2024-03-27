@@ -1,0 +1,58 @@
+.root {
+  padding: 20px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: start;
+
+  &Item {
+    width: 100%;
+  }
+}
+
+.questions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.border {
+  width: calc(100% + 40px);
+  margin: 0 -20px;
+  border: 1px solid var(--purpure200);
+}
+
+.addQuestion {
+  cursor: pointer;
+  font-size: 28px;
+  color: var(--purpure400);
+  border-radius: 10px;
+
+  &:hover {
+    color: var(--purpure600);
+  }
+}
+
+.input {
+  width: 100%;
+  padding: 7px 18px;
+
+  background-color: var(--purpure300);
+  border: 1px solid var(--gray);
+  border-radius: 4px;
+
+  transition: background-color 0.3s ease 0s;
+
+  &:focus {
+    background-color: var(--white);
+  }
+}
+
+.addQuestion {
+  display: flex;
+  justify-content: space-between;
+}

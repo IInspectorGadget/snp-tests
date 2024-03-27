@@ -1,9 +1,12 @@
 import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { selectIsAuthenticated, useGetCurrentUserQuery } from "./testsApi";
+import { useEffect, useMemo } from "react";
 
-const PrivateRoute = () => {
-  const auth = useSelector((state) => state.user.auth);
-  return auth ? <Outlet /> : <Navigate to='/login' />;
+const PrivateRoute = ({ isAuth }) => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === "/auth/login" || location.pathname === "/auth/register";
+  return isAuth || isAuthPage ? <Outlet /> : <Navigate to='/auth/login' />;
 };
 
 export default PrivateRoute;

@@ -1,21 +1,15 @@
-import createSagaMiddleware from "redux-saga";
-import { reducer as userReducer, rootSaga as userSaga } from "./userSaga";
-import { reducer as testsReducer, testsSaga } from "./testsSaga";
-import { applyMiddleware, combineReducers, createStore } from "redux";
+import { configureStore, createSlice } from "@reduxjs/toolkit";
+import testsApi from "./testsApi"; // Предполагается, что у вас есть файл с созданным API, например api.js
+import { authReducer } from "./testsApi";
 
-// Создание саги-прослойки
-const sagaMiddleware = createSagaMiddleware();
-
-const rootReducer = combineReducers({
-  user: userReducer,
-  tests: testsReducer,
+const store = configureStore({
+  reducer: {
+    // Добавляем редьюсеры, созданные с помощью createApi
+    auth: authReducer,
+    [testsApi.reducerPath]: testsApi.reducer,
+  },
+  // Добавляем middleware для работы с асинхронными запросами API
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(testsApi.middleware),
 });
-
-// Создание хранилища Redux, передача корневого редюсера и применение саги-прослойки
-const store = createStore(rootReducer, applyMiddleware(sagaMiddleware));
-
-// Запуск корневой саги
-sagaMiddleware.run(testsSaga);
-sagaMiddleware.run(userSaga);
 
 export default store;

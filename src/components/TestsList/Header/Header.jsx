@@ -4,22 +4,11 @@ import { memo, useCallback, useState } from "react";
 // import Form from "@components/Form";
 
 import s from "./Header.module.scss";
-import { useDispatch, useSelector } from "react-redux";
-import { setOrder } from "@src/utils/testsSaga";
+import { useGetTestsQuery } from "@src/utils/testsApi";
 
 const Header = memo(({ filter, setFilter }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const dispatch = useDispatch();
-  const order = useSelector((state) => state.tests.order);
-  console.log(order);
-
-  const changeOrder = useCallback(() => {
-    if (order) {
-      dispatch(setOrder("-"));
-    } else {
-      dispatch(setOrder(""));
-    }
-  }, [order, dispatch]);
+  const { data: tests, isLoading, isError, isSuccess } = useGetTestsQuery();
 
   const closeModal = useCallback(() => {
     setIsVisible(false);
@@ -41,12 +30,10 @@ const Header = memo(({ filter, setFilter }) => {
       <div className={s.filter}>
         <input type='search' className={s.search} value={filter} placeholder='Поиск' onChange={handlerChange} />
       </div>
-      <button className={s.addButton} onClick={() => changeOrder()}>
+      <button className={s.addButton} onClick={() => 1}>
         Сортировка
       </button>
-      <button className={s.addButton} onClick={handlerClick}>
-        Добавить
-      </button>
+
       {/* {isVisible && (
         <Modal closeModal={closeModal}>
           <Form closeModal={closeModal} />

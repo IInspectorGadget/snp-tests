@@ -1,26 +1,17 @@
 .root {
   cursor: pointer;
+  padding: 10px 20px;
   border-radius: 10px;
   transition: background-color 200ms ease;
 }
 
-.root[type="submit"] {
-  padding: 15px 70.5px;
+.root[type="submit"],
+.root {
   color: var(--white);
   background-color: var(--purpure400);
 
   &:hover {
     background-color: var(--purpure500);
-  }
-}
-
-.root[type="reset"] {
-  padding: 15px 73px;
-  color: var(--white);
-  background-color: var(--gray);
-
-  &:hover {
-    background-color: var(--brown);
   }
 }
 
