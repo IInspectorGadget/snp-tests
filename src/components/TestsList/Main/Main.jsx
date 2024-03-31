@@ -62,7 +62,7 @@ const Main = memo(({ filter }) => {
           <ul className={s.list}>
             {tests?.tests
               ?.filter((item) => checkItem(item))
-              .map((item, idx) => (
+              ?.map((item, idx) => (
                 <li key={idx} className={s.item}>
                   <Link to={`/edit/${item.id}/`} className={s.link} />
                   <div className={s.info}>

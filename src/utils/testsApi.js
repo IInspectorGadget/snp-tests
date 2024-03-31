@@ -41,7 +41,6 @@ const testsApi = createApi({
     },
     credentials: "include",
   }),
-  tagTypes: ["Tests", "Questions", "Answers", "User"],
   endpoints: (builder) => ({
     // Регистрация
     signup: builder.mutation({
@@ -106,7 +105,10 @@ const testsApi = createApi({
     // Получение теста
     getTestById: builder.query({
       query: (id) => `/tests/${id}`,
-      providesTags: ["Tests"],
+      providesTags: (result, error, id) => {
+        console.log(id);
+        return [{ type: "Tests", id }];
+      },
     }),
     // Получение списка тестов с пагинацией
     getTests: builder.query({
@@ -122,6 +124,7 @@ const testsApi = createApi({
         method: "POST",
         body: questionData,
       }),
+      invalidatesTags: (result, error, { test_id }) => [{ type: "Tests", id: test_id }],
     }),
     // Редактирование вопроса
     updateQuestion: builder.mutation({
@@ -130,6 +133,7 @@ const testsApi = createApi({
         method: "PATCH",
         body: updates,
       }),
+      invalidatesTags: (result, error, { test_id }) => [{ type: "Tests", id: test_id }],
     }),
     // Удаление вопроса
     deleteQuestion: builder.mutation({
@@ -137,14 +141,19 @@ const testsApi = createApi({
         url: `/questions/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: (result, error, { test_id }) => [{ type: "Tests", id: test_id }],
     }),
     // Создание ответа
     createAnswer: builder.mutation({
-      query: ({ question_id, ...answerData }) => ({
-        url: `/questions/${question_id}/answers`,
+      query: ({ questionId, ...answerData }) => ({
+        url: `/questions/${questionId}/answers`,
         method: "POST",
         body: answerData,
       }),
+      invalidatesTags: (result, error, { test_id }) => {
+        console.log(test_id);
+        return [{ type: "Tests", id: test_id }];
+      },
     }),
     // Редактирование ответа
     updateAnswer: builder.mutation({
@@ -153,6 +162,7 @@ const testsApi = createApi({
         method: "PATCH",
         body: updates,
       }),
+      invalidatesTags: (result, error, { test_id }) => [{ type: "Tests", id: test_id }],
     }),
     // Перемещение ответа
     moveAnswer: builder.mutation({
@@ -160,13 +170,17 @@ const testsApi = createApi({
         url: `/answers/${id}/insert_at/${position}`,
         method: "PATCH",
       }),
+      invalidatesTags: (result, error, { test_id }) => [{ type: "Tests", id: test_id }],
     }),
     // Удаление ответа
     deleteAnswer: builder.mutation({
-      query: (id) => ({
+      query: ({ id }) => ({
         url: `/answers/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: (result, error, { testId }) => {
+        return [{ type: "Tests", id: testId }];
+      },
     }),
   }),
 });

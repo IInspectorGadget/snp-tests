@@ -3,9 +3,9 @@ import cx from "classnames";
 
 import s from "./FormItem.module.scss";
 
-const FormItem = memo(({ className, children, title }) => {
+const FormItem = memo(({ className, children, title, inline }) => {
   return (
-    <div className={cx(className, s.root)}>
+    <div className={cx(className, s.root, { [s.inline]: inline })}>
       {Boolean(title) && <span className={s.label}>{title}</span>}
       {children}
     </div>

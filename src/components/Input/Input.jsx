@@ -21,8 +21,8 @@ const Input = memo(
   }) => {
     const handlerBlur = useCallback(() => {
       onBlur && onBlur();
-      setValue((prev) => prev.trim());
-      checkErrors && checkErrors(type, value.trim(), maxLength, isRequired, setError, setDirty);
+      type !== "number" && setValue((prev) => prev.trim());
+      checkErrors && checkErrors(type, type !== "number" ? value.trim() : value, maxLength, isRequired, setError, setDirty);
     }, [checkErrors, onBlur, isRequired, maxLength, setDirty, setError, setValue, type, value]);
 
     const handlerChange = useCallback(

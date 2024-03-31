@@ -12,19 +12,33 @@
 }
 
 .item {
+  cursor: pointer;
+
   position: relative;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
+  padding: 10px;
   padding-left: 20px;
 
+  &:not(:first-child) {
+    border: 1px solid black;
+    border-width: 1px 0 0;
+  }
+
   &::before {
-    content: "*";
+    content: "";
+
     position: absolute;
-    top: 3px;
-    left: 0;
+    left: 5px;
+
+    width: 6px;
+    height: 6px;
+
+    background-color: var(--purpure400);
+    border-radius: 50%;
   }
 }
 
@@ -65,4 +79,10 @@
   &::after {
     transform: rotate(-45deg);
   }
+}
+
+.addAnswer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
