@@ -1,70 +1,37 @@
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useRef } from "react";
 import cx from "classnames";
 
 import s from "./Answers.module.scss";
 import { useCreateAnswerMutation, useDeleteAnswerMutation, useMoveAnswerMutation, useUpdateAnswerMutation } from "@src/utils/testsApi";
-import Button from "../Button";
-import FormItem from "../FormItem";
-import { v4 as uuidv4 } from "uuid";
-import { updateTest } from "@src/utils/testsSaga";
 
-const Answers = memo(({ classInput, testId, questionId, value, setValue, type, setUpdateValue }) => {
-  // const [createAnswer] = useCreateAnswerMutation();
-  // const [updateAnswer] = useUpdateAnswerMutation();
-  // const [deleteAnswer] = useDeleteAnswerMutation();
+const Answers = memo(({ classInput, testId, questionId, value, setValue, type }) => {
+  const [createAnswer] = useCreateAnswerMutation();
+  const [updateAnswer] = useUpdateAnswerMutation();
+  const [deleteAnswer] = useDeleteAnswerMutation();
   const [moveAnswer] = useMoveAnswerMutation();
-
-  const [isAnswer, setIsAnswer] = useState(false);
-  const [text, setText] = useState("");
-  //id text is_right
 
   const dragItem = useRef(null);
   const draggedOverItem = useRef(null);
 
-  const handlerAddAnswer = useCallback(() => {
-    setText("");
-    setIsAnswer(false);
-    const id = uuidv4();
-    setValue((prev) => [
-      ...prev,
-      {
-        id,
-        text,
-        is_right: isAnswer,
-      },
-    ]);
-    setUpdateValue((prev) => [
-      ...prev,
-      {
-        id,
-        text,
-        is_right: isAnswer,
-        type: "create",
-      },
-    ]);
-  }, [text, isAnswer, setText, setIsAnswer, setUpdateValue, setValue]);
-
-  const deleteOption = (id) => {
-    setValue((prev) => prev.filter((el) => el.id !== id));
-    setUpdateValue((prev) => {
-      let isHave = false;
-      const newValue = prev.map((el) => {
-        console.log(el.id, id);
-        if (el.id === id && el.type === "create") {
-          isHave = true;
-          return { ...el, type: "none" };
-        } else {
-          return el;
-        }
-      });
-      if (isHave) {
-        return newValue;
-      } else {
-        return [...prev, { id, type: "delete" }];
+  const addOption = useCallback(
+    async (e) => {
+      const target = e.currentTarget;
+      const text = target.value.trim();
+      if (e.key === "Enter" && text) {
+        target.value = "";
+        const { data } = await createAnswer({ questionId, text, testId });
+        setValue((prev) => [...prev, data]);
       }
-    });
-    // setUpdateValue((prev) => [...prev, { id, type: "delete" }]);
-  };
+    },
+    [createAnswer, questionId, testId, setValue],
+  );
+
+  const deleteOption = useCallback(
+    (id) => {
+      deleteAnswer({ id, testId });
+    },
+    [deleteAnswer, testId],
+  );
 
   const handlerChange = async (e, text, id) => {
     setValue((prev) =>
@@ -75,55 +42,20 @@ const Answers = memo(({ classInput, testId, questionId, value, setValue, type, s
         return el;
       }),
     );
-    setUpdateValue((prev) => {
-      console.log(prev, id);
-      let isHave = false;
-      let isBefore = false;
-      const newValue = prev.map((el) => {
-        console.log(el.id, id);
-        if (el.id === id && el.type === "create") {
-          isHave = true;
-          return { ...el, is_right: e.target.checked };
-        } else if (el.id === id && el.type === "edit") {
-          isBefore = true;
-          return { ...el, type: "none" };
-        } else {
-          return el;
-        }
-      });
-      if (isHave) {
-        return newValue;
-      } else if (isBefore) {
-        return [...newValue, { id, text: text, is_right: e.target.checked, type: "edit" }];
-      } else {
-        return [...prev, { id, text: text, is_right: e.target.checked, type: "edit" }];
-      }
-    });
+    updateAnswer({ id, text: text, is_right: e.target.checked });
   };
 
-  const handlerChangeOrder = async (id) => {
+  const handlerChangeOrder = (id) => {
+    console.log(value);
     const newValue = [...value];
     [newValue[dragItem.current], newValue[draggedOverItem.current]] = [newValue[draggedOverItem.current], newValue[dragItem.current]];
-    const { data } = await moveAnswer({ id, position: draggedOverItem.current, testId });
-    console.log(data);
+    moveAnswer({ id, position: draggedOverItem.current, testId });
     setValue(newValue);
   };
 
   return (
     <div className={cx(s.root)}>
-      <div className={s.addAnswer}>
-        <input
-          className={classInput}
-          type='text'
-          value={text}
-          onChange={(e) => setText(e.currentTarget.value.trim())}
-          placeholder='Введите вариант ответа'
-        />
-        <FormItem title='Верный ответ?' inline>
-          <input type='checkbox' checked={isAnswer} onChange={() => setIsAnswer((prev) => !prev)} />
-        </FormItem>
-        <Button type='button' onClick={() => handlerAddAnswer()} value={"Добавить вариант ответа"} />
-      </div>
+      <input className={classInput} type='text' placeholder='Нажмите Enter для добавления' onKeyUp={addOption} />
       {Boolean(value.length) && <p>Варианты ответа:</p>}
       {Boolean(value.length) && (
         <ul className={s.list}>
