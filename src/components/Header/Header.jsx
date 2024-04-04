@@ -20,11 +20,13 @@ const Header = memo(({ className, userData }) => {
               Список тестов
             </Link>
           </li>
-          <li className={s.item}>
-            <Link className={s.link} to='/create'>
-              Создать
-            </Link>
-          </li>
+          {userData.is_admin && (
+            <li className={s.item}>
+              <Link className={s.link} to='/create'>
+                Создать
+              </Link>
+            </li>
+          )}
           <li className={s.item}>{userData?.username}</li>
           <img src={exitSvg} alt='edit' onClick={logout} className={s.logout} />
         </ul>
