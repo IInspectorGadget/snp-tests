@@ -2,21 +2,14 @@ import { memo, useCallback, useRef, useState } from "react";
 import cx from "classnames";
 
 import s from "./Answers.module.scss";
-import { useCreateAnswerMutation, useDeleteAnswerMutation, useMoveAnswerMutation, useUpdateAnswerMutation } from "@src/utils/testsApi";
-import Button from "../Button";
-import FormItem from "../FormItem";
+import Button from "../../Button";
+import FormItem from "../../FormItem";
 import { v4 as uuidv4 } from "uuid";
-import { updateTest } from "@src/utils/testsSaga";
+import CheckBox from "@src/components/CheckBox";
 
-const Answers = memo(({ classInput, testId, questionId, value, setValue, type, setUpdateValue }) => {
-  // const [createAnswer] = useCreateAnswerMutation();
-  // const [updateAnswer] = useUpdateAnswerMutation();
-  // const [deleteAnswer] = useDeleteAnswerMutation();
-  const [moveAnswer] = useMoveAnswerMutation();
-
+const Answers = memo(({ classInput, value, setValue, type, setUpdateValue }) => {
   const [isAnswer, setIsAnswer] = useState(false);
   const [text, setText] = useState("");
-  //id text is_right
 
   const dragItem = useRef(null);
   const draggedOverItem = useRef(null);
@@ -49,7 +42,6 @@ const Answers = memo(({ classInput, testId, questionId, value, setValue, type, s
     setUpdateValue((prev) => {
       let isHave = false;
       const newValue = prev.map((el) => {
-        console.log(el.id, id);
         if (el.id === id && el.type === "create") {
           isHave = true;
           return { ...el, type: "none" };
@@ -63,7 +55,6 @@ const Answers = memo(({ classInput, testId, questionId, value, setValue, type, s
         return [...prev, { id, type: "delete" }];
       }
     });
-    // setUpdateValue((prev) => [...prev, { id, type: "delete" }]);
   };
 
   const handlerChange = async (e, text, id) => {
@@ -76,11 +67,9 @@ const Answers = memo(({ classInput, testId, questionId, value, setValue, type, s
       }),
     );
     setUpdateValue((prev) => {
-      console.log(prev, id);
       let isHave = false;
       let isBefore = false;
       const newValue = prev.map((el) => {
-        console.log(el.id, id);
         if (el.id === id && el.type === "create") {
           isHave = true;
           return { ...el, is_right: e.target.checked };
@@ -103,9 +92,9 @@ const Answers = memo(({ classInput, testId, questionId, value, setValue, type, s
 
   const handlerChangeOrder = async (id) => {
     const newValue = [...value];
-    [newValue[dragItem.current], newValue[draggedOverItem.current]] = [newValue[draggedOverItem.current], newValue[dragItem.current]];
-    const { data } = await moveAnswer({ id, position: draggedOverItem.current, testId });
-    console.log(data);
+    const el = newValue.splice(dragItem.current, 1)[0];
+    newValue.splice(draggedOverItem.current, 0, el);
+    setUpdateValue((prev) => [...prev, { id, type: "move", pos: draggedOverItem.current }]);
     setValue(newValue);
   };
 
@@ -116,11 +105,11 @@ const Answers = memo(({ classInput, testId, questionId, value, setValue, type, s
           className={classInput}
           type='text'
           value={text}
-          onChange={(e) => setText(e.currentTarget.value.trim())}
+          onChange={(e) => setText(e.currentTarget.value)}
           placeholder='Введите вариант ответа'
         />
         <FormItem title='Верный ответ?' inline>
-          <input type='checkbox' checked={isAnswer} onChange={() => setIsAnswer((prev) => !prev)} />
+          <CheckBox isChecked={isAnswer} onChange={() => setIsAnswer((prev) => !prev)} />
         </FormItem>
         <Button type='button' onClick={() => handlerAddAnswer()} value={"Добавить вариант ответа"} />
       </div>
@@ -128,25 +117,25 @@ const Answers = memo(({ classInput, testId, questionId, value, setValue, type, s
       {Boolean(value.length) && (
         <ul className={s.list}>
           {value.map((option, idx) => (
-            <li
-              className={s.item}
-              key={idx}
-              draggable
-              onDragStart={() => (dragItem.current = idx)}
-              onDragEnter={() => (draggedOverItem.current = idx)}
-              onDragEnd={() => handlerChangeOrder(option.id)}
-              onDragOver={(e) => e.preventDefault()}
-            >
-              <span className={s.tag}>{option.text}</span>
-              <div className={s.buttons}>
-                <input
-                  name='answer'
-                  checked={option.is_right}
-                  id={option.id}
-                  type={type}
-                  onChange={(e) => handlerChange(e, option.text, option.id)}
-                />
-                <span className={s.close} onClick={() => deleteOption(option.id)}></span>
+            <li className={s.item} key={idx}>
+              <div
+                className={s.itemContainer}
+                draggable
+                onDragStart={() => (dragItem.current = idx)}
+                onDragEnter={() => (draggedOverItem.current = idx)}
+                onDragEnd={() => handlerChangeOrder(option.id)}
+                onDragOver={(e) => e.preventDefault()}
+              >
+                <span className={s.tag}>{option.text}</span>
+                <div className={s.buttons}>
+                  <CheckBox
+                    name='answer'
+                    id={option.id}
+                    isChecked={option.is_right}
+                    onChange={(e) => handlerChange(e, option.text, option.id)}
+                  />
+                  <span className={s.close} onClick={() => deleteOption(option.id)}></span>
+                </div>
               </div>
             </li>
           ))}

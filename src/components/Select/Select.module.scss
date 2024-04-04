@@ -1,0 +1,16 @@
+.root {
+  cursor: pointer;
+}
+
+.list {
+  background-color: var(--purpure300);
+}
+
+.item {
+  padding: 10px;
+  border: 1px solid var(--purpure200);
+}
+
+.title {
+  border-bottom: 1px solid var(--purpure300);
+}

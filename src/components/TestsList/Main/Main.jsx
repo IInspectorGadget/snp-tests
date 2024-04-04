@@ -1,89 +1,96 @@
-import { memo, useCallback, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
 import cx from "classnames";
 
-// import Modal from "@components/Modal";
-import Container from "@components/Container";
-// import DetailView from "@components/DetailView";
-// import Form from "@components/Form";
+import { memo, useCallback, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDeleteTestMutation } from "@src/utils/testsApi";
+import Pagination from "../Pagination";
+import Modal from "@src/components/Modal";
+import Button from "@src/components/Button";
+
+import editSvg from "@src/assets/edit.svg";
+import deleteSvg from "@src/assets/delete.svg";
 
 import s from "./Main.module.scss";
-import editSvg from "@src/assets/edit.svg";
-import viewSvg from "@src/assets/view.svg";
-import { useGetTestsQuery } from "@src/utils/testsApi";
 
-const Main = memo(({ filter }) => {
+const Main = memo(({ userData, tests, page, setPage }) => {
+  const [deleteTest] = useDeleteTestMutation();
   const [isVisible, setIsVisible] = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
   const [id, setId] = useState(null);
-  const { data: tests, isLoading, isError, isSuccess } = useGetTestsQuery({ page: 1, per: 5, search: "", sort: "created_at_desc" });
-
-  const { pathname } = useLocation();
-
-  const checkItem = useCallback(
-    (item) => {
-      if (!filter) {
-        return true;
-      }
-      const title = item.title.toLowerCase();
-      const filterStr = filter.toLowerCase();
-      return title.includes(filterStr);
-    },
-    [filter],
-  );
+  const [modalType, setModalType] = useState(null);
+  const navigate = useNavigate();
 
   const closeModal = useCallback(() => {
     setIsVisible(false);
   }, [setIsVisible]);
 
-  const handlerClickShowButton = useCallback(
-    (e) => {
-      const newId = e.currentTarget.id;
+  const handlerDelete = useCallback(() => {
+    closeModal();
+    setId(null);
+    deleteTest(id);
+  }, [closeModal, deleteTest, id]);
+
+  const handlerClickDeleteButton = useCallback(
+    (id) => {
       setIsVisible(true);
-      setIsEdit(false);
-      setId(Number(newId));
+      setId(id);
+      setModalType("delete");
     },
-    [setIsVisible, setId],
+    [setId],
   );
 
-  const handlerClickEditButton = useCallback(
-    (e) => {
-      const newId = e.currentTarget.id;
+  const handlerClickStartPassing = useCallback(
+    (id) => {
       setIsVisible(true);
-      setIsEdit(true);
-      setId(Number(newId));
+      setId(id);
+      setModalType("passing");
     },
-    [setIsEdit, setId],
+    [setId],
   );
+
+  const handlerPassingTest = useCallback(() => {
+    navigate(`/passing/${id}/`);
+  }, [navigate, id]);
+
   return (
-    !isLoading && (
-      <main className={s.root}>
-        <Container>
-          <ul className={s.list}>
-            {tests?.tests
-              ?.filter((item) => checkItem(item))
-              ?.map((item, idx) => (
-                <li key={idx} className={s.item}>
-                  <Link to={`/edit/${item.id}/`} className={s.link} />
-                  <div className={s.info}>
-                    <p className={s.title}>{item.title}</p>
-                    <p className={s.date}>{item.date}</p>
-                  </div>
-                  <div className={s.buttons}>
-                    <img src={editSvg} alt='edit' className={cx(s.img, s.imgEdit)} id={item.id} onClick={handlerClickEditButton} />
-                    <img src={viewSvg} alt='view' className={cx(s.img, s.imgView)} id={item.id} onClick={handlerClickShowButton} />
-                  </div>
-                </li>
-              ))}
-          </ul>
-        </Container>
-        {/* {id && isVisible && (
-          <Modal isVisible={isVisible} closeModal={closeModal}>
-            {isEdit ? <Form closeModal={closeModal} isEdit id={id} /> : <DetailView id={id} />}
-          </Modal>
-        )} */}
-      </main>
-    )
+    <main className={s.root}>
+      <ul className={s.list}>
+        {tests?.tests?.map((item, idx) => (
+          <li key={idx} className={s.item}>
+            <div className={s.link} onClick={() => handlerClickStartPassing(item.id)} />
+            <div className={s.info}>
+              <p className={s.title}>{item.title}</p>
+              <p className={s.date}>{item.date}</p>
+            </div>
+            {userData?.is_admin && (
+              <div className={s.buttons}>
+                <Link to={`/edit/${item.id}/`}>
+                  <img src={editSvg} alt='edit' className={cx(s.img, s.imgEdit)} id={item.id} />
+                </Link>
+                <img
+                  src={deleteSvg}
+                  alt='view'
+                  className={cx(s.img, s.imgDelete)}
+                  id={item.id}
+                  onClick={() => handlerClickDeleteButton(item.id)}
+                />
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+      {id && isVisible && (
+        <Modal isVisible={isVisible} closeModal={closeModal} title={modalType === "delete" ? "Удаление" : "Начать тест"}>
+          <div>
+            <p className={s.modalText}>Вы уверены что хотите {modalType === "delete" ? "удалить" : "пройти тест"}</p>
+            <div className={s.modalButtons}>
+              <Button value='Да' type='button' onClick={modalType === "delete" ? handlerDelete : handlerPassingTest} />
+              <Button value='Нет' type='button' onClick={closeModal} />
+            </div>
+          </div>
+        </Modal>
+      )}
+      <Pagination itemsPerPage={8} totalItems={tests.meta.total_count} page={page} setPage={setPage} />
+    </main>
   );
 });
 

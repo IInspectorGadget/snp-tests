@@ -105,7 +105,6 @@ function* checkUserExistenceSaga(action) {
       username: action.payload.username,
       password: action.payload.password,
     });
-    console.log(JSON.stringify(response.data));
     // Check if user exists
     if (response.data) {
       localStorage.setItem("auth", JSON.stringify(response.data));

@@ -57,18 +57,13 @@ const testsApi = createApi({
         method: "POST",
         body: credentials,
       }),
-      invalidatesTags: ["User"],
     }),
     logout: builder.mutation({
       query: () => ({
         url: "/logout",
         method: "DELETE",
       }),
-      onQueryStarted: async () => {
-        // Очищаем куки при выходе из системы
-        console.log(document.cookie);
-        document.cookie = "";
-      },
+      onQueryStarted: async () => {},
       invalidatesTags: ["User"],
     }),
 
@@ -101,12 +96,12 @@ const testsApi = createApi({
         url: `/tests/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["Tests"],
     }),
     // Получение теста
     getTestById: builder.query({
       query: (id) => `/tests/${id}`,
       providesTags: (result, error, id) => {
-        console.log(id);
         return [{ type: "Tests", id }];
       },
     }),
@@ -119,12 +114,12 @@ const testsApi = createApi({
     }),
     // Создание вопроса
     createQuestion: builder.mutation({
-      query: ({ test_id, ...questionData }) => ({
-        url: `/tests/${test_id}/questions`,
+      query: ({ testId, ...questionData }) => ({
+        url: `/tests/${testId}/questions`,
         method: "POST",
         body: questionData,
       }),
-      invalidatesTags: (result, error, { test_id }) => [{ type: "Tests", id: test_id }],
+      invalidatesTags: (result, error, { testId }) => [{ type: "Tests", id: testId }],
     }),
     // Редактирование вопроса
     updateQuestion: builder.mutation({
@@ -133,7 +128,7 @@ const testsApi = createApi({
         method: "PATCH",
         body: updates,
       }),
-      invalidatesTags: (result, error, { test_id }) => [{ type: "Tests", id: test_id }],
+      invalidatesTags: (result, error, { testId }) => [{ type: "Tests", id: testId }],
     }),
     // Удаление вопроса
     deleteQuestion: builder.mutation({
@@ -141,7 +136,7 @@ const testsApi = createApi({
         url: `/questions/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, { test_id }) => [{ type: "Tests", id: test_id }],
+      invalidatesTags: (result, error, { testId }) => [{ type: "Tests", id: testId }],
     }),
     // Создание ответа
     createAnswer: builder.mutation({
@@ -150,9 +145,8 @@ const testsApi = createApi({
         method: "POST",
         body: answerData,
       }),
-      invalidatesTags: (result, error, { test_id }) => {
-        console.log(test_id);
-        return [{ type: "Tests", id: test_id }];
+      invalidatesTags: (result, error, { testId }) => {
+        return [{ type: "Tests", id: testId }];
       },
     }),
     // Редактирование ответа
@@ -162,7 +156,7 @@ const testsApi = createApi({
         method: "PATCH",
         body: updates,
       }),
-      invalidatesTags: (result, error, { test_id }) => [{ type: "Tests", id: test_id }],
+      invalidatesTags: (result, error, { testId }) => [{ type: "Tests", id: testId }],
     }),
     // Перемещение ответа
     moveAnswer: builder.mutation({
@@ -170,7 +164,7 @@ const testsApi = createApi({
         url: `/answers/${id}/insert_at/${position}`,
         method: "PATCH",
       }),
-      invalidatesTags: (result, error, { test_id }) => [{ type: "Tests", id: test_id }],
+      invalidatesTags: (result, error, { testId }) => [{ type: "Tests", id: testId }],
     }),
     // Удаление ответа
     deleteAnswer: builder.mutation({

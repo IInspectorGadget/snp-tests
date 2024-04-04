@@ -1,31 +1,32 @@
 import Input from "@src/components/Input";
-import s from "./LoginForm.module.scss";
-import { useCallback, useState } from "react";
+
+import { memo, useCallback, useState } from "react";
 import Button from "@src/components/Button";
 import { Link } from "react-router-dom";
-import { useSigninMutation, setCurrentUser } from "@src/utils/testsApi";
-import { useDispatch } from "react-redux";
+import { useSigninMutation } from "@src/utils/testsApi";
 
-const LoginForm = ({ classNames }) => {
-  const dispatch = useDispatch();
+import s from "./LoginForm.module.scss";
+
+const LoginForm = memo(({ classNames, refetchUserData }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [signin, { isLoading, isError }] = useSigninMutation();
+  const [signin] = useSigninMutation();
+  const [error, setError] = useState("");
 
   const handlerSubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      const { data } = await signin({ username, password });
-      // dispatch(
-      //   setCurrentUser({
-      //     user: data,
-      //     isAuth: true,
-      //   }),
-      // );
-      // localStorage.setItem("user", JSON.stringify(data));
-      // localStorage.setItem("isAuth", true);
+      const { error } = await signin({ username, password });
+      if (error?.status === 400) {
+        setError("Не верный логин или пароль");
+      } else if (error?.status === 401) {
+        setError("Не допустимые значения");
+      } else {
+        setError("");
+        refetchUserData();
+      }
     },
-    [signin, dispatch, password, username],
+    [signin, refetchUserData, password, username],
   );
 
   return (
@@ -38,15 +39,18 @@ const LoginForm = ({ classNames }) => {
         </div>
         <div className={classNames.item}>
           <span className={classNames.label}>Пароль</span>
-          <Input value={password} setValue={setPassword} className={classNames.input} type='text' />
+          <Input type='password' value={password} setValue={setPassword} className={classNames.input} />
         </div>
+        {error.length !== 0 && <p className={s.error}>{error}</p>}
         <Link to='/auth/register'>Зарегистрироваться?</Link>
         <div className={classNames.item}>
-          <Button type='submit' />
+          <Button type='submit' value='Войти' />
         </div>
       </div>
     </form>
   );
-};
+});
+
+LoginForm.displayName = "LoginForm";
 
 export default LoginForm;

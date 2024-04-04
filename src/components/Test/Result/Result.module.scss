@@ -1,0 +1,54 @@
+.root {
+  width: 100%;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.question {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.border {
+  width: calc(100% + 40px);
+  margin: 0 -20px;
+  border: 1px solid var(--purpure200);
+}
+
+.answer {
+  &Correct {
+    color: green;
+  }
+
+  &Failed {
+    color: #e10845;
+  }
+
+  &Right {
+    font-weight: 700;
+  }
+}
+
+.correctAnswers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  font-weight: 700;
+  text-align: center;
+
+  &Title {
+    text-transform: uppercase;
+  }
+}

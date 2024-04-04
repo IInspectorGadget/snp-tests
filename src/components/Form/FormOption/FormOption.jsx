@@ -1,19 +1,24 @@
-import s from "./FormOption.module.scss";
-import FormItem from "../FormItem";
-import Input from "../Input";
-import Answers from "../Answers";
-import Button from "../Button";
 import cx from "classnames";
-import { useCallback, useEffect, useRef, useState } from "react";
+
+import FormItem from "../../FormItem";
+import Input from "@src/components/Input";
+import Answers from "../Answers";
+import Button from "@src/components/Button";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
   useCreateAnswerMutation,
   useCreateQuestionMutation,
   useDeleteAnswerMutation,
+  useMoveAnswerMutation,
   useUpdateAnswerMutation,
   useUpdateQuestionMutation,
 } from "@src/utils/testsApi";
 import checkInput from "@src/utils/checkInput";
-import Error from "../Error";
+import Error from "@src/components/Error";
+import Modal from "@src/components/Modal";
+import Select from "@src/components/Select";
+
+import s from "./FormOption.module.scss";
 
 const checkType = (setTypeError, setTypeDirty, type) => {
   if (type === "0") {
@@ -26,16 +31,16 @@ const checkType = (setTypeError, setTypeDirty, type) => {
   }
 };
 
-const FormOption = ({ className, inputClassName, id, item, questions }) => {
+const FormOption = memo(({ className, inputClassName, id, item, questions }) => {
   const [newItem, setNewItem] = useState(item);
   const [questionId, setQuestionId] = useState(item?.id);
   const [title, setTitle] = useState(item?.title ?? "");
   const [answers, setAnswers] = useState(item?.answers ?? []);
   const [updateAnswers, setUpdateAnswers] = useState(item?.answers ?? []);
   const [type, setType] = useState(item?.question_type ?? "0");
-  const [numberAnswer, setNumberAnswer] = useState(1);
+  const [numberAnswer, setNumberAnswer] = useState("1");
 
-  const [isUpdated, setIsUpdated] = useState(true);
+  const isUpdate = useRef(true);
 
   const [typeError, setTypeError] = useState("");
   const [typeDirty, setTypeDirty] = useState("");
@@ -54,6 +59,17 @@ const FormOption = ({ className, inputClassName, id, item, questions }) => {
   const [createAnswer] = useCreateAnswerMutation();
   const [updateAnswer] = useUpdateAnswerMutation();
   const [deleteAnswer] = useDeleteAnswerMutation();
+  const [moveAnswer] = useMoveAnswerMutation();
+
+  const [isVisible, setIsVisible] = useState(false);
+
+  const closeModal = useCallback(() => {
+    setIsVisible(false);
+  }, [setIsVisible]);
+
+  const showModal = useCallback(() => {
+    setIsVisible(true);
+  }, []);
 
   useEffect(() => {
     item && setNewItem(item);
@@ -66,16 +82,12 @@ const FormOption = ({ className, inputClassName, id, item, questions }) => {
   }, [questions, questionId]);
 
   useEffect(() => {
-    if (isUpdated) {
+    if (isUpdate.current) {
       setAnswers((prev) => newItem?.answers ?? prev);
       setTitle((prev) => newItem?.title ?? prev);
       setType((prev) => newItem?.question_type ?? prev);
     }
-  }, [newItem, isUpdated]);
-
-  const questionSave = (e) => {
-    e.preventDefault();
-  };
+  }, [newItem]);
 
   const checkNumberValue = useCallback(() => {
     if (!numberAnswer.length) {
@@ -90,7 +102,7 @@ const FormOption = ({ className, inputClassName, id, item, questions }) => {
 
   const checkAnswers = useCallback(() => {
     const count = answers.filter((obj) => obj.is_right === true).length;
-    if (answers.length < 2) {
+    if (answers.length < 2 && type !== "number") {
       setAnswersError("Вопрос не может содержать менее 2 вариантов ответа");
       setAnswersDirty(true);
       return false;
@@ -113,46 +125,79 @@ const FormOption = ({ className, inputClassName, id, item, questions }) => {
         setAnswersDirty(false);
         return true;
       }
+    } else if (type === "number") {
+      if (typeof +numberAnswer === "number") {
+        setAnswersDirty(false);
+        return true;
+      } else {
+        setAnswersError("Ответ должен быть числом");
+        setAnswersDirty(true);
+        return false;
+      }
     }
     setAnswersDirty(false);
     return true;
-  }, [answers, type]);
+  }, [answers, type, numberAnswer]);
 
-  const handlerCreateQuestion = useCallback(async () => {
+  const createNewQuestion = useCallback(async () => {
     const isTitleCorrect = checkInput(title, true, setTitleError, setTitleDirty);
     const isTypeCorrect = checkType(setTypeError, setTypeDirty, type);
     const isNumberValueCorrect = type === "number" ? checkNumberValue() : true;
     const isAnswerCorrect = checkAnswers();
-    console.log(isNumberValueCorrect, isTitleCorrect, isTypeCorrect, isAnswerCorrect);
     if (isNumberValueCorrect && isTitleCorrect && isTypeCorrect && isAnswerCorrect) {
-      setIsUpdated(false);
-      const params = { test_id: id, title, question_type: type, answer: numberAnswer };
+      isUpdate.current = false;
+      const params = { testId: id, title, question_type: type, answer: numberAnswer };
       if (!questionId) {
         const { data } = await createQuestion(params);
-        setQuestionId(data.id);
+        setQuestionId(null);
+        setNewItem(null);
+        setTitle("");
+        setAnswers([]);
+        setUpdateAnswers([]);
+        setType("0");
+        setNumberAnswer("1");
         for (const { text, is_right } of answers) {
           await createAnswer({ questionId: data.id, text, is_right, testId: id });
         }
       } else {
         updateQuestion({ id: questionId, ...params });
-        console.log(updateAnswers);
+        let newId = {};
         for (const { text, is_right, id: answerId, type } of updateAnswers) {
-          if (type === "delete") {
-            deleteAnswer({ id: answerId, textId: id });
-          } else if (type === "create") {
-            await createAnswer({ questionId, text, is_right, testId: id });
-          } else if (type === "edit") {
-            updateAnswer({ id: answerId, textId: id, text, is_right });
+          if (type === "create") {
+            const { data } = await createAnswer({ questionId, text, is_right, testId: id });
+            updateAnswers.forEach((el) => {
+              if (el.id === answerId) {
+                newId = { ...newId, [el.id]: data.id };
+              }
+            });
+          } else if (type === "delete") {
+            await deleteAnswer({ id: answerId, textId: id });
           }
-          setUpdateAnswers([]);
+        }
+        const newUpdateValue = updateAnswers.map((el) => {
+          if (newId[el.id]) {
+            return { ...el, id: newId[el.id] };
+          } else {
+            return el;
+          }
+        });
+        for (const { text, is_right, id: answerId, type, pos } of newUpdateValue) {
+          if (type === "edit") {
+            await updateAnswer({ id: answerId, testId: id, text, is_right });
+          } else if (type === "move") {
+            await moveAnswer({ id: answerId, position: pos, testId: id });
+          }
         }
       }
-      setIsUpdated(true);
+
+      setUpdateAnswers([]);
+      isUpdate.current = true;
     }
   }, [
     checkAnswers,
     createQuestion,
     updateQuestion,
+    moveAnswer,
     checkNumberValue,
     deleteAnswer,
     updateAnswer,
@@ -166,21 +211,25 @@ const FormOption = ({ className, inputClassName, id, item, questions }) => {
     questionId,
   ]);
 
-  const handlerTypeChange = (e) => {
-    setType(e.currentTarget.value);
-  };
+  const handlerSave = useCallback(() => {
+    createNewQuestion();
+    closeModal();
+  }, [createNewQuestion, closeModal]);
 
   return (
     <div className={cx(className, s.root)}>
       <FormItem title='Выберите тип вопроса'>
-        <select value={type} className={s.input} onChange={handlerTypeChange}>
-          <option value='0' disabled>
-            Выберите
-          </option>
-          <option value={"single"}>Один из списка</option>
-          <option value={"multiple"}>Несколько из списка</option>
-          <option value={"number"}>Численный ответ</option>
-        </select>
+        <Select
+          className={s.input}
+          types={[
+            { type: "single", value: "один из списка" },
+            { type: "multiple", value: "Несколько из списка" },
+            { type: "number", value: "Численный ответ" },
+          ]}
+          setType={setType}
+          type={type}
+        />
+
         <Error dirty={typeDirty} error={typeError} />
       </FormItem>
       <FormItem title='Введите текст вопроса'>
@@ -210,14 +259,28 @@ const FormOption = ({ className, inputClassName, id, item, questions }) => {
             setValue={setAnswers}
             setUpdateValue={setUpdateAnswers}
           />
+          <Error dirty={answersDirty} error={answersError} />
         </FormItem>
       )}
 
       <div>
-        <Button type='button' onClick={() => handlerCreateQuestion(id)} value={questionId ? "Сохранить вопрос" : "Добавить вопрос"} />
+        <Button type='button' onClick={showModal} value={questionId ? "Сохранить вопрос" : "Добавить вопрос"} />
       </div>
+      {isVisible && (
+        <Modal isVisible={isVisible} closeModal={closeModal} title={questionId ? "Сохранение" : "Добавление"}>
+          <div>
+            <p className={s.modalText}>Вы уверены что {questionId ? "сохранить" : "добавить"} вопрос</p>
+            <div className={s.modalButtons}>
+              <Button value='Да' type='button' onClick={handlerSave} />
+              <Button value='Нет' type='button' onClick={closeModal} />
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
-};
+});
+
+FormOption.displayName = "FormOption";
 
 export default FormOption;

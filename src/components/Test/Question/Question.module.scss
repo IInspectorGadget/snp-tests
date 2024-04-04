@@ -1,12 +1,30 @@
 .root {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
   width: 100%;
 }
 
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.list {
+  padding-top: 40px;
+}
+
+.item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.numberInput {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .input {
-  width: 100%;
   padding: 7px 18px;
 
   background-color: var(--purpure300);
