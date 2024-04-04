@@ -1,22 +1,17 @@
-import { memo, useCallback, useState } from "react";
-
-// import Modal from "@components/Modal";
-// import Form from "@components/Form";
+import { memo, useCallback } from "react";
 
 import s from "./Header.module.scss";
-import { useGetTestsQuery } from "@src/utils/testsApi";
 
-const Header = memo(({ filter, setFilter }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const { data: tests, isLoading, isError, isSuccess } = useGetTestsQuery();
-
-  const closeModal = useCallback(() => {
-    setIsVisible(false);
-  }, [setIsVisible]);
-
-  const handlerClick = useCallback(() => {
-    setIsVisible(true);
-  }, [setIsVisible]);
+const Header = memo(({ filter, setFilter, setSort }) => {
+  const handlerSort = useCallback(() => {
+    setSort((prev) => {
+      if (prev === "created_at_desc") {
+        return "created_at_asc ";
+      } else {
+        return "created_at_desc";
+      }
+    });
+  }, [setSort]);
 
   const handlerChange = useCallback(
     (e) => {
@@ -30,15 +25,9 @@ const Header = memo(({ filter, setFilter }) => {
       <div className={s.filter}>
         <input type='search' className={s.search} value={filter} placeholder='Поиск' onChange={handlerChange} />
       </div>
-      <button className={s.addButton} onClick={() => 1}>
+      <button className={s.addButton} onClick={handlerSort}>
         Сортировка
       </button>
-
-      {/* {isVisible && (
-        <Modal closeModal={closeModal}>
-          <Form closeModal={closeModal} />
-        </Modal>
-      )} */}
     </div>
   );
 });

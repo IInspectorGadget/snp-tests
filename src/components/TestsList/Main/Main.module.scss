@@ -1,3 +1,10 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  height: 100%;
+}
+
 .list {
   display: flex;
   flex-direction: column;
@@ -10,6 +17,7 @@
   align-items: center;
   justify-content: space-between;
 
+  min-height: 70px;
   padding: 10px 0 10px 20px;
 
   border-bottom: 1px solid var(--gray);
@@ -66,4 +74,15 @@
 .link {
   position: absolute;
   inset: 0;
+}
+
+.modalButtons {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.modalText {
+  text-align: center;
 }

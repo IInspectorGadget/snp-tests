@@ -2,6 +2,10 @@
   padding: 20px;
 }
 
+.itemButtons {
+  width: 40px;
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -23,10 +27,10 @@
   position: relative;
 
   display: flex;
-  align-items: center;
+  gap: 10px;
   justify-content: space-between;
 
-  padding: 10px 0 10px 20px;
+  padding: 10px 0;
 
   transition: background-color 0.3s ease 0s;
 }
@@ -52,8 +56,15 @@
   filter: brightness(0) saturate(100%) invert(40%) sepia(28%) saturate(717%) hue-rotate(264deg) brightness(87%) contrast(89%);
 }
 
-.itemTitle {
-  margin-left: -20px;
+.modalButtons {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.modalText {
+  text-align: center;
 }
 
 .itemShow {

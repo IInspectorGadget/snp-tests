@@ -1,5 +1,6 @@
-import { memo, useCallback } from "react";
 import cx from "classnames";
+
+import { memo, useCallback } from "react";
 
 import s from "./Input.module.scss";
 

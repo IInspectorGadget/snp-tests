@@ -1,15 +1,16 @@
 import cx from "classnames";
 
-import s from "./Header.module.scss";
+import { memo } from "react";
 import { Link } from "react-router-dom";
-import { useGetCurrentUserQuery, useLogoutMutation } from "@src/utils/testsApi";
+import { useLogoutMutation } from "@src/utils/testsApi";
 
-const Header = ({ className }) => {
-  const { data } = useGetCurrentUserQuery();
+import exitSvg from "@src/assets/exit.svg";
+
+import s from "./Header.module.scss";
+
+const Header = memo(({ className, userData }) => {
   const [logout] = useLogoutMutation();
-  const handlerLogout = () => {
-    logout();
-  };
+
   return (
     <div className={cx(s.root, className)}>
       <nav className={s.nav}>
@@ -19,21 +20,21 @@ const Header = ({ className }) => {
               Список тестов
             </Link>
           </li>
-          <li className={s.item}>
-            <Link className={s.link} to='/create'>
-              Создать
-            </Link>
-          </li>
-          <li className={s.item}>
-            <span onClick={handlerLogout} className={s.logout}>
-              выход
-            </span>
-          </li>
-          <li className={s.item}>{data.username}</li>
+          {userData.is_admin && (
+            <li className={s.item}>
+              <Link className={s.link} to='/create'>
+                Создать
+              </Link>
+            </li>
+          )}
+          <li className={s.item}>{userData?.username}</li>
+          <img src={exitSvg} alt='edit' onClick={logout} className={s.logout} />
         </ul>
       </nav>
     </div>
   );
-};
+});
+
+Header.displayName = "Header";
 
 export default Header;

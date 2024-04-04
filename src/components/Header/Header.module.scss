@@ -14,8 +14,19 @@
 
 .link {
   color: var(--white);
+  transition: 0.2s ease all;
+
+  &:hover {
+    color: var(--purpure200);
+  }
 }
 
 .logout {
   cursor: pointer;
+  width: 30px;
+  height: 30px;
+
+  &:hover {
+    filter: brightness(0) saturate(100%) invert(97%) sepia(10%) saturate(608%) hue-rotate(281deg) brightness(89%) contrast(94%);
+  }
 }

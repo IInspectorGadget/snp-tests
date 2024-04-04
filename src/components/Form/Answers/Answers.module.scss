@@ -14,6 +14,13 @@
 .item {
   cursor: pointer;
 
+  &:not(:first-child) {
+    border: 1px solid black;
+    border-width: 1px 0 0;
+  }
+}
+
+.itemContainer {
   position: relative;
 
   display: flex;
@@ -22,11 +29,6 @@
 
   padding: 10px;
   padding-left: 20px;
-
-  &:not(:first-child) {
-    border: 1px solid black;
-    border-width: 1px 0 0;
-  }
 
   &::before {
     content: "";
@@ -84,5 +86,6 @@
 .addAnswer {
   display: flex;
   flex-direction: column;
+  gap: 10px;
   align-items: flex-start;
 }
