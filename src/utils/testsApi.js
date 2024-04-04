@@ -31,8 +31,6 @@ const testsApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: BASE_URL,
     prepareHeaders: (headers) => {
-      // Здесь вы можете добавить любые заголовки, необходимые для каждого запроса
-      // Например, если вы хотите добавить заголовок аутентификации, вы можете получить его из состояния Redux
       headers.set(
         "scope-key",
         "DfjzAPRkCYwb8GnKuZHFEUpLr2BsETAz7yJjnX3gV9Cxs4EjgHat9FnNLVRfxuGczkt7hrgd8HDa3TeQPVfCwBKmJZPfWUEn7GeF93HqgsV52K",
