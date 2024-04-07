@@ -1,6 +1,6 @@
 import cx from "classnames";
 
-import { useCreateTestMutation, useDeleteQuestionMutation, useGetTestByIdQuery, useUpdateTestMutation } from "@src/utils/testsApi";
+import { useCreateTestMutation, useDeleteQuestionMutation, useLazyGetTestByIdQuery, useUpdateTestMutation } from "@src/utils/testsApi";
 import FormItem from "../FormItem";
 import Input from "../Input";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
@@ -21,20 +21,27 @@ const Form = memo(({ className }) => {
   const { id: idParam } = useParams();
   const newId = useRef(null);
   let id = idParam ?? newId.current;
-  const { data: test, refetch, isLoading } = useGetTestByIdQuery(id);
+
+  const [fetchTest, { data: test, isLoading }] = useLazyGetTestByIdQuery();
   const [createTest] = useCreateTestMutation();
   const [updateTest] = useUpdateTestMutation();
   const [deleteQuestion] = useDeleteQuestionMutation();
-  const [title, setTitle] = useState("");
 
   const [isAddQuestion, setIsAddQuestion] = useState(false);
   const [editOption, setEditOption] = useState(null);
 
+  const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState("");
   const [titleDirty, setTitleDirty] = useState("");
 
   const [isVisible, setIsVisible] = useState(false);
   const [idQuestion, setIdQuestion] = useState(null);
+
+  useEffect(() => {
+    if (idParam) {
+      fetchTest(id);
+    }
+  }, [fetchTest, idParam, id]);
 
   useEffect(() => {
     setTitle((prev) => (test?.title && id && !prev ? test.title : prev));
@@ -81,11 +88,12 @@ const Form = memo(({ className }) => {
     [setIdQuestion],
   );
 
-  const handlerDelete = useCallback(() => {
+  const handlerDelete = useCallback(async () => {
     closeModal();
     setIdQuestion(null);
-    deleteQuestion(idQuestion);
-  }, [closeModal, deleteQuestion, idQuestion]);
+    await deleteQuestion(idQuestion);
+    fetchTest(id);
+  }, [closeModal, deleteQuestion, idQuestion, fetchTest, id]);
 
   return (
     <div className={cx(s.root, className)}>
@@ -103,7 +111,7 @@ const Form = memo(({ className }) => {
           {isAddQuestion && (
             <>
               <div className={s.border} />
-              <FormOption inputClassName={s.input} id={id} refetch={refetch} questions={test?.questions} />
+              <FormOption inputClassName={s.input} id={id} refetch={fetchTest} questions={test?.questions} />
             </>
           )}
 
@@ -149,7 +157,7 @@ const Form = memo(({ className }) => {
                           <img src={deleteSvg} alt='delete' className={cx(s.img, s.imgEdit)} onClick={() => deleteQuestions(el.id)} />
                         </div>
                       </div>
-                      <FormOption index={idx + 1} className={s.itemEdit} inputClassName={s.input} id={id} item={el} />
+                      <FormOption index={idx + 1} className={s.itemEdit} inputClassName={s.input} id={id} refetch={fetchTest} item={el} />
                     </div>
                   )}
                 </li>

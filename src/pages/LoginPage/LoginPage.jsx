@@ -18,7 +18,7 @@ const LoginPage = memo(({ className, isAuth, refetchUserData }) => {
     <div className={cx(s.root, className)}>
       <Routes>
         <Route element={<LoginForm refetchUserData={refetchUserData} classNames={s} />} path='/login' />
-        <Route element={<RegisterForm classNames={s} />} path='/register' />
+        <Route element={<RegisterForm refetchUserData={refetchUserData} classNames={s} />} path='/register' />
       </Routes>
     </div>
   );

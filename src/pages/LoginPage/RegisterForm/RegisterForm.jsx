@@ -1,13 +1,13 @@
 import { memo, useCallback, useState } from "react";
 import Input from "@src/components/Input";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Button from "@src/components/Button";
 import Error from "@src/components/Error";
 import { useSignupMutation } from "@src/utils/testsApi";
 import CheckBox from "@src/components/CheckBox";
 import FormItem from "@src/components/FormItem";
 
-const RegisterForm = memo(({ classNames }) => {
+const RegisterForm = memo(({ classNames, refetchUserData }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
@@ -15,9 +15,8 @@ const RegisterForm = memo(({ classNames }) => {
   const [dirty, setDirty] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [signup] = useSignupMutation();
-  const navigate = useNavigate();
   const handlerSubmit = useCallback(
-    (e) => {
+    async (e) => {
       e.preventDefault();
       if (password !== passwordConfirmation) {
         setError("Пароли не совпадают");
@@ -31,15 +30,15 @@ const RegisterForm = memo(({ classNames }) => {
       }
       setDirty(false);
       setError("");
-      const { error } = signup({ username, password, password_confirmation: passwordConfirmation, is_admin: isAdmin });
+      const { error } = await signup({ username, password, password_confirmation: passwordConfirmation, is_admin: isAdmin });
       if (error?.status) {
-        setError("Ощибка сервера");
+        setError("Ошибка сервера");
         setDirty(true);
         return;
       }
-      navigate("/auth/login");
+      refetchUserData();
     },
-    [navigate, signup, password, username, passwordConfirmation, isAdmin],
+    [signup, password, username, passwordConfirmation, isAdmin, refetchUserData],
   );
 
   return (
@@ -58,7 +57,6 @@ const RegisterForm = memo(({ classNames }) => {
         <FormItem title='Администратор?' inline>
           <CheckBox isChecked={isAdmin} setIsChecked={setIsAdmin} onChange={(e) => setIsAdmin(e.target.checked)} />
         </FormItem>
-
         <Error error={error} dirty={dirty} />
         <Link to='/auth/login'>Войти?</Link>
         <div className={classNames.item}>

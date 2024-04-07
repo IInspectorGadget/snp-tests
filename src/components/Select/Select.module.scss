@@ -1,14 +1,21 @@
 .root {
   cursor: pointer;
+  position: relative;
 }
 
 .list {
+  position: absolute;
+  width: 100%;
   background-color: var(--purpure300);
 }
 
 .item {
   padding: 10px;
   border: 1px solid var(--purpure200);
+
+  &:hover {
+    background-color: var(--purpure100);
+  }
 }
 
 .title {

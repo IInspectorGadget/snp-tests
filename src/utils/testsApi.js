@@ -6,7 +6,7 @@ axios.defaults.withCredentials = true;
 axios.defaults.headers.common["scope-key"] =
   "DfjzAPRkCYwb8GnKuZHFEUpLr2BsETAz7yJjnX3gV9Cxs4EjgHat9FnNLVRfxuGczkt7hrgd8HDa3TeQPVfCwBKmJZPfWUEn7GeF93HqgsV52K";
 
-const BASE_URL = "https://interns-test-fe.snp.agency/api/v1/"; // Замените на ваш базовый URL API
+const BASE_URL = "https://interns-test-fe.snp.agency/api/v1/";
 
 const authSlice = createSlice({
   name: "auth",
@@ -28,6 +28,7 @@ export const selectIsAuthenticated = (state) => state.auth.isAuth;
 
 const testsApi = createApi({
   reducerPath: "testsApi",
+  tagTypes: ["Tests", "User"],
   baseQuery: fetchBaseQuery({
     baseUrl: BASE_URL,
     prepareHeaders: (headers) => {
@@ -56,6 +57,7 @@ const testsApi = createApi({
         body: credentials,
       }),
     }),
+    // Выход
     logout: builder.mutation({
       query: () => ({
         url: "/logout",
@@ -99,13 +101,13 @@ const testsApi = createApi({
     // Получение теста
     getTestById: builder.query({
       query: (id) => `/tests/${id}`,
-      providesTags: (result, error, id) => {
-        return [{ type: "Tests", id }];
-      },
+      // providesTags: (result, error, id) => {
+      //   return [{ type: "Tests", id }];
+      // },
     }),
     // Получение списка тестов с пагинацией
     getTests: builder.query({
-      query: ({ page = 1, per = 5, search = "", sort = "created_at_desc" } = {}) => ({
+      query: ({ page = 1, per = 2, search = "", sort = "created_at_desc" } = {}) => ({
         url: `/tests?page=${page}&per=${per}&search=${search}&sort=${sort}`,
       }),
       providesTags: ["Tests"],
@@ -185,6 +187,7 @@ export const {
   useUpdateTestMutation,
   useDeleteTestMutation,
   useGetTestByIdQuery,
+  useLazyGetTestByIdQuery,
   useGetTestsQuery,
   useCreateQuestionMutation,
   useUpdateQuestionMutation,

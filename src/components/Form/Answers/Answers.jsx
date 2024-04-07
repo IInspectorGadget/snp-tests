@@ -7,7 +7,7 @@ import FormItem from "../../FormItem";
 import { v4 as uuidv4 } from "uuid";
 import CheckBox from "@src/components/CheckBox";
 
-const Answers = memo(({ classInput, value, setValue, type, setUpdateValue }) => {
+const Answers = memo(({ classInput, value, setValue, setUpdateValue }) => {
   const [isAnswer, setIsAnswer] = useState(false);
   const [text, setText] = useState("");
 
@@ -37,66 +37,75 @@ const Answers = memo(({ classInput, value, setValue, type, setUpdateValue }) => 
     ]);
   }, [text, isAnswer, setText, setIsAnswer, setUpdateValue, setValue]);
 
-  const deleteOption = (id) => {
-    setValue((prev) => prev.filter((el) => el.id !== id));
-    setUpdateValue((prev) => {
-      let isHave = false;
-      const newValue = prev.map((el) => {
-        if (el.id === id && el.type === "create") {
-          isHave = true;
-          return { ...el, type: "none" };
+  const deleteOption = useCallback(
+    (id) => {
+      setValue((prev) => prev.filter((el) => el.id !== id));
+      setUpdateValue((prev) => {
+        let isHave = false;
+        const newValue = prev.map((el) => {
+          if (el.id === id && el.type === "create") {
+            isHave = true;
+            return { ...el, type: "none" };
+          } else {
+            return el;
+          }
+        });
+        if (isHave) {
+          return newValue;
         } else {
-          return el;
+          return [...prev, { id, type: "delete" }];
         }
       });
-      if (isHave) {
-        return newValue;
-      } else {
-        return [...prev, { id, type: "delete" }];
-      }
-    });
-  };
+    },
+    [setUpdateValue, setValue],
+  );
 
-  const handlerChange = async (e, text, id) => {
-    setValue((prev) =>
-      prev.map((el) => {
-        if (el.id === id) {
-          return { ...el, is_right: !el.is_right };
-        }
-        return el;
-      }),
-    );
-    setUpdateValue((prev) => {
-      let isHave = false;
-      let isBefore = false;
-      const newValue = prev.map((el) => {
-        if (el.id === id && el.type === "create") {
-          isHave = true;
-          return { ...el, is_right: e.target.checked };
-        } else if (el.id === id && el.type === "edit") {
-          isBefore = true;
-          return { ...el, type: "none" };
-        } else {
+  const handlerChange = useCallback(
+    async (e, text, id) => {
+      setValue((prev) =>
+        prev.map((el) => {
+          if (el.id === id) {
+            return { ...el, is_right: !el.is_right };
+          }
           return el;
+        }),
+      );
+      setUpdateValue((prev) => {
+        let isHave = false;
+        let isBefore = false;
+        const newValue = prev.map((el) => {
+          if (el.id === id && el.type === "create") {
+            isHave = true;
+            return { ...el, is_right: e.target.checked };
+          } else if (el.id === id && el.type === "edit") {
+            isBefore = true;
+            return { ...el, type: "none" };
+          } else {
+            return el;
+          }
+        });
+        if (isHave) {
+          return newValue;
+        } else if (isBefore) {
+          return [...newValue, { id, text: text, is_right: e.target.checked, type: "edit" }];
+        } else {
+          return [...prev, { id, text: text, is_right: e.target.checked, type: "edit" }];
         }
       });
-      if (isHave) {
-        return newValue;
-      } else if (isBefore) {
-        return [...newValue, { id, text: text, is_right: e.target.checked, type: "edit" }];
-      } else {
-        return [...prev, { id, text: text, is_right: e.target.checked, type: "edit" }];
-      }
-    });
-  };
+    },
+    [setUpdateValue, setValue],
+  );
 
-  const handlerChangeOrder = async (id) => {
-    const newValue = [...value];
-    const el = newValue.splice(dragItem.current, 1)[0];
-    newValue.splice(draggedOverItem.current, 0, el);
-    setUpdateValue((prev) => [...prev, { id, type: "move", pos: draggedOverItem.current }]);
-    setValue(newValue);
-  };
+  const handlerChangeOrder = useCallback(
+    async (id) => {
+      const newValue = [...value];
+      const el = newValue.splice(dragItem.current, 1)[0];
+      newValue.splice(draggedOverItem.current, 0, el);
+      setUpdateValue((prev) => [...prev, { id, type: "move", pos: draggedOverItem.current }]);
+      setValue(newValue);
+    },
+    [setUpdateValue, setValue, value],
+  );
 
   return (
     <div className={cx(s.root)}>

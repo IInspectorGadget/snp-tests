@@ -4,7 +4,7 @@ import FormItem from "../../FormItem";
 import Input from "@src/components/Input";
 import Answers from "../Answers";
 import Button from "@src/components/Button";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import {
   useCreateAnswerMutation,
   useCreateQuestionMutation,
@@ -31,7 +31,7 @@ const checkType = (setTypeError, setTypeDirty, type) => {
   }
 };
 
-const FormOption = memo(({ className, inputClassName, id, item, questions }) => {
+const FormOption = memo(({ className, inputClassName, id, item, questions, refetch }) => {
   const [newItem, setNewItem] = useState(item);
   const [questionId, setQuestionId] = useState(item?.id);
   const [title, setTitle] = useState(item?.title ?? "");
@@ -39,8 +39,6 @@ const FormOption = memo(({ className, inputClassName, id, item, questions }) => 
   const [updateAnswers, setUpdateAnswers] = useState(item?.answers ?? []);
   const [type, setType] = useState(item?.question_type ?? "0");
   const [numberAnswer, setNumberAnswer] = useState("1");
-
-  const isUpdate = useRef(true);
 
   const [typeError, setTypeError] = useState("");
   const [typeDirty, setTypeDirty] = useState("");
@@ -82,11 +80,9 @@ const FormOption = memo(({ className, inputClassName, id, item, questions }) => 
   }, [questions, questionId]);
 
   useEffect(() => {
-    if (isUpdate.current) {
-      setAnswers((prev) => newItem?.answers ?? prev);
-      setTitle((prev) => newItem?.title ?? prev);
-      setType((prev) => newItem?.question_type ?? prev);
-    }
+    setAnswers((prev) => newItem?.answers ?? prev);
+    setTitle((prev) => newItem?.title ?? prev);
+    setType((prev) => newItem?.question_type ?? prev);
   }, [newItem]);
 
   const checkNumberValue = useCallback(() => {
@@ -145,7 +141,6 @@ const FormOption = memo(({ className, inputClassName, id, item, questions }) => 
     const isNumberValueCorrect = type === "number" ? checkNumberValue() : true;
     const isAnswerCorrect = checkAnswers();
     if (isNumberValueCorrect && isTitleCorrect && isTypeCorrect && isAnswerCorrect) {
-      isUpdate.current = false;
       const params = { testId: id, title, question_type: type, answer: numberAnswer };
       if (!questionId) {
         const { data } = await createQuestion(params);
@@ -191,9 +186,10 @@ const FormOption = memo(({ className, inputClassName, id, item, questions }) => 
       }
 
       setUpdateAnswers([]);
-      isUpdate.current = true;
+      refetch(id);
     }
   }, [
+    refetch,
     checkAnswers,
     createQuestion,
     updateQuestion,

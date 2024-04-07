@@ -7,13 +7,14 @@ import { useGetCurrentUserQuery } from "./utils/testsApi";
 import "./App.scss";
 
 function App() {
-  const { isSuccess, isLoading, refetch } = useGetCurrentUserQuery();
+  const { data, isSuccess, isLoading, refetch } = useGetCurrentUserQuery();
+
   return (
     <div className='root'>
       <Router>
         <Routes>
           <Route element={<PrivateRoute isAuth={isSuccess} isLoading={isLoading} />}>
-            <Route element={<HomePage />} path='*' exact />
+            <Route element={<HomePage data={data} isLoading={isLoading} />} path='*' exact />
           </Route>
           <Route element={<LoginPage refetchUserData={refetch} isAuth={isSuccess} isLoading={isLoading} />} path='/auth/*' />
         </Routes>

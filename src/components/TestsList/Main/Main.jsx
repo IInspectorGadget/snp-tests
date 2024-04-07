@@ -12,7 +12,7 @@ import deleteSvg from "@src/assets/delete.svg";
 
 import s from "./Main.module.scss";
 
-const Main = memo(({ userData, tests, page, setPage }) => {
+const Main = memo(({ userData, tests, page, setPage, PerPage }) => {
   const [deleteTest] = useDeleteTestMutation();
   const [isVisible, setIsVisible] = useState(false);
   const [id, setId] = useState(null);
@@ -21,7 +21,7 @@ const Main = memo(({ userData, tests, page, setPage }) => {
 
   const closeModal = useCallback(() => {
     setIsVisible(false);
-  }, [setIsVisible]);
+  }, []);
 
   const handlerDelete = useCallback(() => {
     closeModal();
@@ -89,7 +89,7 @@ const Main = memo(({ userData, tests, page, setPage }) => {
           </div>
         </Modal>
       )}
-      <Pagination itemsPerPage={8} totalItems={tests.meta.total_count} page={page} setPage={setPage} />
+      <Pagination itemsPerPage={PerPage} totalItems={tests.meta.total_count} page={page} setPage={setPage} />
     </main>
   );
 });

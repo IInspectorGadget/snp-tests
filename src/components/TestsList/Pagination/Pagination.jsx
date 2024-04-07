@@ -1,19 +1,22 @@
 import cx from "classnames";
 
-import { memo } from "react";
+import { memo, useCallback } from "react";
 
 import s from "./Pagination.module.scss";
 
 const Pagination = memo(({ className, itemsPerPage, totalItems, page, setPage }) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const goToPage = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setPage(page);
-    }
-  };
+  const goToPage = useCallback(
+    (page) => {
+      if (page >= 1 && page <= totalPages) {
+        setPage(page);
+      }
+    },
+    [totalPages, setPage],
+  );
 
-  const renderPageNumbers = () => {
+  const renderPageNumbers = useCallback(() => {
     const pageNumbers = [];
     let startPage = Math.max(1, page - 1);
     let endPage = Math.min(totalPages, startPage + 2);
@@ -30,7 +33,7 @@ const Pagination = memo(({ className, itemsPerPage, totalItems, page, setPage })
       );
     }
     return pageNumbers;
-  };
+  }, [goToPage, page, totalPages]);
 
   return (
     <div className={cx(s.root, className)}>

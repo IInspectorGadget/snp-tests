@@ -1,5 +1,6 @@
-import { memo } from "react";
 import cx from "classnames";
+
+import { memo } from "react";
 
 import s from "./Container.module.scss";
 

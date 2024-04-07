@@ -1,4 +1,5 @@
 import { memo, useCallback } from "react";
+import Input from "@src/components/Input";
 
 import s from "./Header.module.scss";
 
@@ -13,19 +14,12 @@ const Header = memo(({ filter, setFilter, setSort }) => {
     });
   }, [setSort]);
 
-  const handlerChange = useCallback(
-    (e) => {
-      setFilter(e.currentTarget.value);
-    },
-    [setFilter],
-  );
-
   return (
     <div className={s.root}>
       <div className={s.filter}>
-        <input type='search' className={s.search} value={filter} placeholder='Поиск' onChange={handlerChange} />
+        <Input type='search' className={s.search} value={filter} placeholder='Поиск' setValue={setFilter} />
       </div>
-      <button className={s.addButton} onClick={handlerSort}>
+      <button className={s.button} onClick={handlerSort}>
         Сортировка
       </button>
     </div>

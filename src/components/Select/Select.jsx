@@ -5,7 +5,7 @@ import { memo, useCallback, useState } from "react";
 import s from "./Select.module.scss";
 
 const Select = memo(({ className, types, type, setType }) => {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(types?.find((el) => el.type === type)?.value ?? "");
   const [isVisible, setIsVisible] = useState(false);
   const handlerChange = useCallback(
     (value, type) => {
