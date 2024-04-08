@@ -9,7 +9,7 @@ const Result = ({ className, test, answers }) => {
         const correctAnswers =
           question.question_type !== "number"
             ? question.answers.filter((answer) => answer.is_right).map((answer) => answer.id)
-            : [question.answer];
+            : [+question.answer];
         const userQuestionAnswers = answers[index];
         if (
           correctAnswers.length === userQuestionAnswers.length &&

@@ -1,6 +1,6 @@
 import cx from "classnames";
 
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDeleteTestMutation } from "@src/utils/testsApi";
 import Pagination from "../Pagination";
@@ -51,6 +51,15 @@ const Main = memo(({ userData, tests, page, setPage, PerPage }) => {
     navigate(`/passing/${id}/`);
   }, [navigate, id]);
 
+  const modalData = useMemo(() => {
+    switch (modalType) {
+      case "delete":
+        return { title: "Удаление", text: "удалить", acceptHandler: handlerDelete };
+      default:
+        return { title: "Начать тест", text: "пройти тест", acceptHandler: handlerPassingTest };
+    }
+  }, [modalType, handlerDelete, handlerPassingTest]);
+
   return (
     <main className={s.root}>
       <ul className={s.list}>
@@ -79,11 +88,11 @@ const Main = memo(({ userData, tests, page, setPage, PerPage }) => {
         ))}
       </ul>
       {id && isVisible && (
-        <Modal isVisible={isVisible} closeModal={closeModal} title={modalType === "delete" ? "Удаление" : "Начать тест"}>
+        <Modal isVisible={isVisible} closeModal={closeModal} title={modalData.title}>
           <div>
-            <p className={s.modalText}>Вы уверены что хотите {modalType === "delete" ? "удалить" : "пройти тест"}</p>
+            <p className={s.modalText}>Вы уверены что хотите {modalData.text}</p>
             <div className={s.modalButtons}>
-              <Button value='Да' type='button' onClick={modalType === "delete" ? handlerDelete : handlerPassingTest} />
+              <Button value='Да' type='button' onClick={modalData.acceptHandler} />
               <Button value='Нет' type='button' onClick={closeModal} />
             </div>
           </div>

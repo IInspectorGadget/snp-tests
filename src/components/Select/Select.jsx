@@ -14,8 +14,11 @@ const Select = memo(({ className, types, type, setType }) => {
     },
     [setType],
   );
+
+  const visibleChange = useCallback(() => setIsVisible((prev) => !prev), []);
+
   return (
-    <div className={cx(s.root)} onClick={() => setIsVisible((prev) => !prev)}>
+    <div className={cx(s.root)} onClick={visibleChange}>
       <div className={className}>
         {type === "0" && <p className={s.title}>-</p>}
         {type !== "0" && <p>{value}</p>}

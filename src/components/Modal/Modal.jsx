@@ -20,9 +20,9 @@ const Modal = memo(({ closeModal, children, title }) => {
   }, [closeModal, closeModalOnEsc]);
 
   return (
-    <div className={s.root} onClick={() => closeModal(false)}>
+    <div className={s.root} onClick={() => closeModal()}>
       <div className={s.wrapper} onClick={(e) => e.stopPropagation()}>
-        <div className={s.close} onClick={() => closeModal(false)} />
+        <div className={s.close} onClick={() => closeModal()} />
         <p className={s.title}>{title}</p>
         {children}
       </div>

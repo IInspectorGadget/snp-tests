@@ -34,10 +34,14 @@ const Test = memo(({ className }) => {
   }, [questionIndex, test]);
 
   const prevQuestion = useCallback(() => {
-    if (questionIndex !== 0) {
+    if (questionIndex) {
       setQuestionIndex((prev) => prev - 1);
     }
   }, [questionIndex]);
+
+  const handlerTestEnd = useCallback(() => {
+    setIsEnd(true);
+  }, []);
 
   return (
     <div className={cx(s.root, className)}>
@@ -46,24 +50,22 @@ const Test = memo(({ className }) => {
           {isSuccess && test.questions.length !== 0 ? (
             <>
               {!isEnd && (
-                <p>
-                  {questionIndex + 1}/{test.questions.length}
-                </p>
-              )}
-              {!isEnd && (
-                <Question
-                  question={test.questions[questionIndex]}
-                  questionIndex={questionIndex}
-                  answers={answers}
-                  setAnswers={setAnswers}
-                />
-              )}
-              {!isEnd && (
-                <div className={s.navigate}>
-                  {questionIndex !== 0 && <Button onClick={prevQuestion} value='Назад' />}
-                  {test.questions.length !== questionIndex + 1 && <Button onClick={nextQuestion} value='Вперёд' />}
-                  {test.questions.length === countNonEmpty(answers) && <Button onClick={() => setIsEnd(true)} value='Завершить тест' />}
-                </div>
+                <>
+                  <p>
+                    {questionIndex + 1}/{test.questions.length}
+                  </p>
+                  <Question
+                    question={test.questions[questionIndex]}
+                    questionIndex={questionIndex}
+                    answers={answers}
+                    setAnswers={setAnswers}
+                  />
+                  <div className={s.navigate}>
+                    {questionIndex !== 0 && <Button onClick={prevQuestion} value='Назад' />}
+                    {test.questions.length !== questionIndex + 1 && <Button onClick={nextQuestion} value='Вперёд' />}
+                    {test.questions.length === countNonEmpty(answers) && <Button onClick={handlerTestEnd} value='Завершить тест' />}
+                  </div>
+                </>
               )}
               {isEnd && <Result test={test} answers={answers} />}
             </>

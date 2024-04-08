@@ -4,9 +4,7 @@ import { memo } from "react";
 
 import s from "./Loader.module.scss";
 
-const Loader = memo(({ className }) => {
-  return <div className={cx(s.root, className)}></div>;
-});
+const Loader = memo(({ className }) => <div className={cx(s.root, className)} />);
 
 Loader.displayName = "Loader";
 

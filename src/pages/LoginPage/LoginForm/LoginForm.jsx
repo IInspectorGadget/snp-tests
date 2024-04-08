@@ -21,6 +21,8 @@ const LoginForm = memo(({ classNames, refetchUserData }) => {
         setError("Не верный логин или пароль");
       } else if (error?.status === 401) {
         setError("Недопустимые значения");
+      } else if (error?.status) {
+        setError("Что-то пошло не так");
       } else {
         setError("");
         refetchUserData();

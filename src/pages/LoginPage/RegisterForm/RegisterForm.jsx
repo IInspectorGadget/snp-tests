@@ -32,11 +32,12 @@ const RegisterForm = memo(({ classNames, refetchUserData }) => {
       setError("");
       const { error } = await signup({ username, password, password_confirmation: passwordConfirmation, is_admin: isAdmin });
       if (error?.status) {
-        setError("Ошибка сервера");
+        setError("Что-то пошло не так");
         setDirty(true);
         return;
+      } else {
+        refetchUserData();
       }
-      refetchUserData();
     },
     [signup, password, username, passwordConfirmation, isAdmin, refetchUserData],
   );
