@@ -110,7 +110,7 @@ const testsApi = createApi({
       query: ({ page = 1, per = 2, search = "", sort = "created_at_desc" } = {}) => ({
         url: `/tests?page=${page}&per=${per}&search=${search}&sort=${sort}`,
       }),
-      providesTags: ["Tests"],
+      // providesTags: ["Tests"],
     }),
     // Создание вопроса
     createQuestion: builder.mutation({
