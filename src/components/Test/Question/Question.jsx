@@ -53,6 +53,7 @@ const Question = memo(({ className, question, answers, setAnswers, questionIndex
     },
     [questionIndex, setAnswers, question],
   );
+
   return (
     <div className={cx(s.root, className)}>
       <p className={s.title}>{question.title}</p>
@@ -71,7 +72,7 @@ const Question = memo(({ className, question, answers, setAnswers, questionIndex
                 <Radio
                   name='answer'
                   isChecked={currentAnswers.find((item) => item === el.id)}
-                  onClick={(e) => handlerAnswerChange(e, el.id)}
+                  onChange={(e) => handlerAnswerChange(e, el.id)}
                 />
               )}
 
@@ -82,7 +83,7 @@ const Question = memo(({ className, question, answers, setAnswers, questionIndex
       )}
       {question.question_type === "number" && (
         <div className={s.numberInput}>
-          <input type='text' value={number} placeholder='Ваш ответ' onChange={(e) => handlerAnswerChange(e)} className={s.input} />
+          <input type='text' value={number} placeholder='Ваш ответ' onChange={handlerAnswerChange} className={s.input} />
         </div>
       )}
     </div>

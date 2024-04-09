@@ -17,6 +17,8 @@ import deleteSvg from "@src/assets/delete.svg";
 
 import s from "./Form.module.scss";
 
+const preventEventDefault = (e) => e.preventDefault();
+
 const Form = memo(({ className }) => {
   const { id: idParam } = useParams();
   const newId = useRef(null);
@@ -99,7 +101,7 @@ const Form = memo(({ className }) => {
     <div className={cx(s.root, className)}>
       {isLoading && idParam && <Loader />}
       {(!isLoading || !idParam) && (
-        <form onSubmit={(e) => e.preventDefault()} className={s.form}>
+        <form onSubmit={preventEventDefault} className={s.form}>
           <FormItem className={s.formItem} title='Название'>
             <Input onBlur={handlerCreateTest} value={title} setValue={setTitle} placeholder={"Введите название"} className={s.input} />
             <Error dirty={titleDirty} error={titleError} />

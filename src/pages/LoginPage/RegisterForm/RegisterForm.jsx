@@ -42,6 +42,8 @@ const RegisterForm = memo(({ classNames, refetchUserData }) => {
     [signup, password, username, passwordConfirmation, isAdmin, refetchUserData],
   );
 
+  const adminChange = useCallback((e) => setIsAdmin(e.target.checked), []);
+
   return (
     <form onSubmit={handlerSubmit}>
       <div className={classNames.container}>
@@ -56,7 +58,7 @@ const RegisterForm = memo(({ classNames, refetchUserData }) => {
           <Input type='password' value={passwordConfirmation} setValue={setPasswordConfirmation} className={classNames.input} isRequired />
         </FormItem>
         <FormItem title='Администратор?' inline>
-          <CheckBox isChecked={isAdmin} setIsChecked={setIsAdmin} onChange={(e) => setIsAdmin(e.target.checked)} />
+          <CheckBox isChecked={isAdmin} setIsChecked={setIsAdmin} onChange={adminChange} />
         </FormItem>
         <Error error={error} dirty={dirty} />
         <Link to='/auth/login'>Войти?</Link>

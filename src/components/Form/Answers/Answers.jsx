@@ -1,11 +1,14 @@
-import { memo, useCallback, useRef, useState } from "react";
 import cx from "classnames";
 
-import s from "./Answers.module.scss";
+import { memo, useCallback, useRef, useState } from "react";
 import Button from "../../Button";
 import FormItem from "../../FormItem";
 import { v4 as uuidv4 } from "uuid";
 import CheckBox from "@src/components/CheckBox";
+
+import s from "./Answers.module.scss";
+
+const preventEventDefault = (e) => e.preventDefault();
 
 const Answers = memo(({ classInput, value, setValue, setUpdateValue }) => {
   const [isAnswer, setIsAnswer] = useState(false);
@@ -96,6 +99,8 @@ const Answers = memo(({ classInput, value, setValue, setUpdateValue }) => {
     [setUpdateValue, setValue],
   );
 
+  const changeAnswer = useCallback(() => setIsAnswer((prev) => !prev), []);
+
   const handlerChangeOrder = useCallback(
     async (id) => {
       const newValue = [...value];
@@ -107,20 +112,18 @@ const Answers = memo(({ classInput, value, setValue, setUpdateValue }) => {
     [setUpdateValue, setValue, value],
   );
 
+  const changeText = useCallback((e) => {
+    setText(e.currentTarget.value);
+  }, []);
+
   return (
     <div className={cx(s.root)}>
       <div className={s.addAnswer}>
-        <input
-          className={classInput}
-          type='text'
-          value={text}
-          onChange={(e) => setText(e.currentTarget.value)}
-          placeholder='Введите вариант ответа'
-        />
+        <input className={classInput} type='text' value={text} onChange={changeText} placeholder='Введите вариант ответа' />
         <FormItem title='Верный ответ?' inline>
-          <CheckBox isChecked={isAnswer} onChange={() => setIsAnswer((prev) => !prev)} />
+          <CheckBox isChecked={isAnswer} onChange={changeAnswer} />
         </FormItem>
-        <Button type='button' onClick={() => handlerAddAnswer()} value={"Добавить вариант ответа"} />
+        <Button type='button' onClick={handlerAddAnswer} value={"Добавить вариант ответа"} />
       </div>
       {Boolean(value.length) && <p>Варианты ответа:</p>}
       {Boolean(value.length) && (
@@ -133,7 +136,7 @@ const Answers = memo(({ classInput, value, setValue, setUpdateValue }) => {
                 onDragStart={() => (dragItem.current = idx)}
                 onDragEnter={() => (draggedOverItem.current = idx)}
                 onDragEnd={() => handlerChangeOrder(option.id)}
-                onDragOver={(e) => e.preventDefault()}
+                onDragOver={preventEventDefault}
               >
                 <span className={s.tag}>{option.text}</span>
                 <div className={s.buttons}>

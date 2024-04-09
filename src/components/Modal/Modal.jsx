@@ -2,6 +2,8 @@ import { memo, useCallback, useEffect } from "react";
 
 import s from "./Modal.module.scss";
 
+const stopEventPropagation = (e) => e.stopPropagation();
+
 const Modal = memo(({ closeModal, children, title }) => {
   const closeModalOnEsc = useCallback(
     (e) => {
@@ -20,9 +22,9 @@ const Modal = memo(({ closeModal, children, title }) => {
   }, [closeModal, closeModalOnEsc]);
 
   return (
-    <div className={s.root} onClick={() => closeModal()}>
-      <div className={s.wrapper} onClick={(e) => e.stopPropagation()}>
-        <div className={s.close} onClick={() => closeModal()} />
+    <div className={s.root} onClick={closeModal}>
+      <div className={s.wrapper} onClick={stopEventPropagation}>
+        <div className={s.close} onClick={closeModal} />
         <p className={s.title}>{title}</p>
         {children}
       </div>
